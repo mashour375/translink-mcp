@@ -1,0 +1,76 @@
+name: Python
+
+on:
+    push:
+        branches:
+            - main
+    pull_request:
+    release:
+        types: [published]
+
+jobs:
+    test:
+        name: Test Translink server
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install uv
+              uses: astral-sh/setup-uv@v3
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version-file: "src/mcp_server_translink/.python-version"
+
+            - name: Install dependencies
+              working-directory: src/mcp_server_translink
+              run: uv sync --frozen --all-extras --dev
+
+            - name: Check if tests exist
+              id: check-tests
+              working-directory: src/mcp_server_translink
+              run: |
+                  if [ -d "tests" ] || [ -d "test" ] || grep -q "pytest" pyproject.toml; then
+                    echo "has-tests=true" >> $GITHUB_OUTPUT
+                  else
+                    echo "has-tests=false" >> $GITHUB_OUTPUT
+                  fi
+
+            - name: Run tests
+              if: steps.check-tests.outputs.has-tests == 'true'
+              working-directory: src/mcp_server_translink
+              run: uv run pytest
+
+    build:
+        name: Build Translink server
+        runs-on: ubuntu-latest
+        needs: test
+        steps:
+            - uses: actions/checkout@v4
+
+            - name: Install uv
+              uses: astral-sh/setup-uv@v3
+
+            - name: Set up Python
+              uses: actions/setup-python@v5
+              with:
+                  python-version-file: "src/mcp_server_translink/.python-version"
+
+            - name: Install dependencies
+              working-directory: src/mcp_server_translink
+              run: uv sync --frozen --all-extras --dev
+
+            - name: Run pyright
+              working-directory: src/mcp_server_translink
+              run: uv run --frozen pyright
+
+            - name: Build package
+              working-directory: src/mcp_server_translink
+              run: uv build
+
+            - name: Upload artifacts
+              uses: actions/upload-artifact@v4
+              with:
+                  name: dist-mcp_server_translink
+                  path: src/mcp_server_translink/dist/
