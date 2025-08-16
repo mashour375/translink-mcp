@@ -21,15 +21,15 @@ jobs:
             - name: Set up Python
               uses: actions/setup-python@v5
               with:
-                  python-version-file: "src/mcp_server_translink/.python-version"
+                  python-version-file: "./.python-version"
 
             - name: Install dependencies
-              working-directory: src/mcp_server_translink
+              working-directory: ./mcp_server_translink
               run: uv sync --frozen --all-extras --dev
 
             - name: Check if tests exist
               id: check-tests
-              working-directory: src/mcp_server_translink
+              working-directory: ./mcp_server_translink
               run: |
                   if [ -d "tests" ] || [ -d "test" ] || grep -q "pytest" pyproject.toml; then
                     echo "has-tests=true" >> $GITHUB_OUTPUT
@@ -39,7 +39,7 @@ jobs:
 
             - name: Run tests
               if: steps.check-tests.outputs.has-tests == 'true'
-              working-directory: src/mcp_server_translink
+              working-directory: ./mcp_server_translink
               run: uv run pytest
 
     build:
@@ -55,22 +55,22 @@ jobs:
             - name: Set up Python
               uses: actions/setup-python@v5
               with:
-                  python-version-file: "src/mcp_server_translink/.python-version"
+                  python-version-file: "./.python-version"
 
             - name: Install dependencies
-              working-directory: src/mcp_server_translink
+              working-directory: ./mcp_server_translink
               run: uv sync --frozen --all-extras --dev
 
             - name: Run pyright
-              working-directory: src/mcp_server_translink
+              working-directory: ./mcp_server_translink
               run: uv run --frozen pyright
 
             - name: Build package
-              working-directory: src/mcp_server_translink
+              working-directory: ./mcp_server_translink
               run: uv build
 
             - name: Upload artifacts
               uses: actions/upload-artifact@v4
               with:
                   name: dist-mcp_server_translink
-                  path: src/mcp_server_translink/dist/
+                  path: ./mcp_server_translink/dist/
