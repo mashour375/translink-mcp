@@ -11,8 +11,8 @@ from mcp.types import (
 import httpx
 import json
 from enum import Enum
-from google.transit.gtfs_realtime_pb2 import FeedMessage
 from google.protobuf.json_format import MessageToJson
+from google.transit.gtfs_realtime_pb2 import FeedMessage  # pyright: ignore
 
 
 class TranslinkTool(str, Enum):

@@ -3,7 +3,7 @@ Shared pytest fixtures for the MCP Server tests.
 """
 import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
-from google.transit.gtfs_realtime_pb2 import FeedMessage
+from google.transit.gtfs_realtime_pb2 import FeedMessage  # pyright: ignore
 
 
 @pytest.fixture
